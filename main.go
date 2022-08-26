@@ -47,7 +47,15 @@ func main() {
 
 	router.HandleFunc("/{tag}", TagRequest).Methods("GET")
 
-	fmt.Println("Server at 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	var port, port_set = os.LookupEnv("PORT")
+	if !port_set {
+		port = "8080"
+		log.Print(fmt.Sprintf("Using default port: %s", port))
+	} else {
+		log.Print(fmt.Sprintf("Port override found: %s", port))
+	}
+
+	log.Print(fmt.Sprintf("Server listening at %s", port))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), router))
 
 }
