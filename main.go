@@ -13,13 +13,6 @@ import (
 
 var path = "lurls.txt"
 
-// func LookUpTag(tag string) string {
-// 	if err != nil {
-// 		return
-// 	}
-// 	defer file.Close()
-// }
-
 func TagRequest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	match := false
@@ -30,7 +23,6 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("URL file not found or can't be opened"))
 		return
-
 	}
 
 	scanner := bufio.NewScanner(file)
