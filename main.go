@@ -28,6 +28,7 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// URL file not found or can't be opened
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("URL file not found or can't be opened"))
 		return
 
 	}
@@ -43,6 +44,7 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	if match == false {
 		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Tag not found"))
 	}
 }
 
