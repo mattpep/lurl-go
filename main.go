@@ -11,13 +11,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var path = "lurls.txt"
-
 func TagRequest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	match := false
 	tag := params["tag"]
-	var file, err = os.OpenFile(path, os.O_RDWR, 0644)
+
+	var lurl_path string
+	var err error
+	var path_override, path_set = os.LookupEnv("LURLS")
+	if !path_set {
+		lurl_path, err = os.Getwd()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Could not determine working directory"))
+			log.Print("Could not determine working directory")
+			return
+		}
+	} else {
+		lurl_path = path_override
+	}
+
+	var file *os.File
+	file, err = os.OpenFile(lurl_path+"/lurls.txt", os.O_RDONLY, 0644)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("URL file not found or can't be opened"))
