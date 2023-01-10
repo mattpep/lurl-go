@@ -9,8 +9,17 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"golang.org/x/sys/unix"
 )
 
+func isatty() bool {
+	_, err := unix.IoctlGetWinsize(int(os.Stdout.Fd()), unix.TIOCGWINSZ)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
+}
 func TagRequest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	match := false
@@ -59,6 +68,18 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter()
+	var log_file *os.File
+	var err error
+
+	// in headless mode we write logs to a file, else to the screen
+	if !isatty() {
+		log_file, err = os.OpenFile("/var/log/lurl/lurl.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			log.SetOutput(log_file)
+		}
+	}
 
 	router.HandleFunc("/{tag}", TagRequest).Methods("GET")
 
