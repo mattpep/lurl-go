@@ -8,8 +8,9 @@ There are lots of public URL shortners. This is my own.
 
 This app has no mechanism (from the web) to add URLs. This is intentional, as
 it prevents the need to write a login or authentication system. The URLs are
-stored in a plain text file which is space-separated records one per line.
-Each line has two keys: the short tag and the destination URL.
+stored in a plain text file which is space-separated records one per line and
+read on each request.  Each line has two keys: the short tag and the
+destination URL.
 
 # Configuration
 
@@ -22,4 +23,5 @@ There are two environment variables:
 
 # License
 Written by Matt Peperell (matt@peperell.com), licensed under MIT. The text for
-this license should be distributed with this software.
+this license should be distributed with this software but it can also be found
+at https://en.wikipedia.org/wiki/MIT_License
