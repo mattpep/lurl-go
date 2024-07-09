@@ -20,6 +20,12 @@ func isatty() bool {
 		return true
 	}
 }
+
+func NoTagRequest(w http.ResponseWriter, r *http.Request) {
+	log.Print(fmt.Sprintf("Request index page using %s from %s", r.Proto, r.RemoteAddr))
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("No tag specified"))
+}
 func TagRequest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	match := false
@@ -82,6 +88,7 @@ func main() {
 	}
 
 	router.HandleFunc("/{tag}", TagRequest).Methods("GET")
+	router.HandleFunc("/", NoTagRequest).Methods("GET")
 
 	var port, port_set = os.LookupEnv("PORT")
 	if !port_set {
