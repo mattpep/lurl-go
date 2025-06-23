@@ -1,0 +1,22 @@
+---
+- name: Deploy
+  hosts: all
+  become: true
+  tasks:
+    - name: Stop lurl
+      ansible.builtin.service:
+        name: lurl
+        state: stopped
+
+    - name: Replace binary
+      ansible.builtin.copy:
+        dest: /usr/local/bin/lurl
+        src: /tmp/artifacts/lurl
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Start lurl
+      ansible.builtin.service:
+        name: lurl
+        state: started
