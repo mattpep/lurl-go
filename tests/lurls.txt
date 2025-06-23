@@ -1,0 +1,2 @@
+e https://www.example.com/
+gh https://www.github.com/
