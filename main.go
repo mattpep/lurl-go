@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -96,6 +97,16 @@ func main() {
 		log.Print(fmt.Sprintf("Using default port: %s", port))
 	} else {
 		log.Print(fmt.Sprintf("Port override found: %s", port))
+	}
+
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				log.Print(fmt.Sprintf("Version: %s", setting.Value))
+			}
+		}
+	} else {
+		log.Print("Unknown version. Not built from a git repo?")
 	}
 
 	log.Print(fmt.Sprintf("Server listening at %s", port))
