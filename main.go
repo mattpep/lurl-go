@@ -51,7 +51,7 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("URL file not found or can't be opened"))
-		log.Print("Received request but URL file was missing or could not be opened")
+		log.Print("Received request but URL file was missing or could not be opened (attempted path was " + lurl_path + ")")
 		return
 	}
 
