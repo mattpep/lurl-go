@@ -22,8 +22,22 @@ func isatty() bool {
 	}
 }
 
+func addressFromRequest(r *http.Request) string {
+	addr := r.Header.Get("X-Real-IP")
+	if addr != "" {
+		return addr
+	}
+
+	addr = r.Header.Get("X-Forwarded-For")
+	if addr != "" {
+		return addr
+	}
+
+	return r.RemoteAddr
+}
+
 func NoTagRequest(w http.ResponseWriter, r *http.Request) {
-	log.Print(fmt.Sprintf("Request index page using %s from %s", r.Proto, r.RemoteAddr))
+	log.Print(fmt.Sprintf("Request for index page using %s from %s", r.Proto, addressFromRequest(r)))
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte("No tag specified"))
 }
@@ -31,6 +45,8 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	match := false
 	tag := params["tag"]
+
+	source := addressFromRequest(r)
 
 	var lurl_path string
 	var err error
@@ -52,7 +68,7 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("URL file not found or can't be opened"))
-		log.Print("Received request but URL file was missing or could not be opened (attempted path was " + lurl_path + ")")
+		log.Print(fmt.Sprintf("Received request from %s but URL file was missing or could not be opened (attempted path was "+lurl_path+")", source))
 		return
 	}
 
@@ -60,14 +76,14 @@ func TagRequest(w http.ResponseWriter, r *http.Request) {
 	for scanner.Scan() {
 		v := strings.Fields(scanner.Text())
 		if v[0] == tag {
-			log.Print(fmt.Sprintf("Request for %s (%s) using %s from %s", tag, v[1], r.Proto, r.RemoteAddr))
+			log.Print(fmt.Sprintf("Request for %s (%s) using %s from %s", tag, v[1], r.Proto, source))
 			match = true
 			http.Redirect(w, r, v[1], http.StatusFound)
 			break
 		}
 	}
 	if match == false {
-		log.Print(fmt.Sprintf("Request for unknown tag %s using %s from %s", tag, r.Proto, r.RemoteAddr))
+		log.Print(fmt.Sprintf("Request for unknown tag %s using %s from %s", tag, r.Proto, source))
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Tag not found"))
 	}
